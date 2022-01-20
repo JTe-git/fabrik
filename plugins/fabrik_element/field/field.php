@@ -4,7 +4,7 @@
  *
  * @package     Joomla.Plugin
  * @subpackage  Fabrik.element.field
- * @copyright   Copyright (C) 2005-2016  Media A-Team, Inc. - All rights reserved.
+ * @copyright   Copyright (C) 2005-2020  Media A-Team, Inc. - All rights reserved.
  * @license     GNU/GPL http://www.gnu.org/copyleft/gpl.html
  */
 
@@ -137,7 +137,10 @@ class PlgFabrik_ElementField extends PlgFabrik_Element
 
 		if (!$this->getFormModel()->failedValidation())
 		{
-			$value = $this->numberFormat($value);
+			if ($this->isEditable())
+			{
+				$value = $this->numberFormat($value);
+			}
 		}
 
 		if (!$this->isEditable())
@@ -153,7 +156,9 @@ class PlgFabrik_ElementField extends PlgFabrik_Element
 			else
 			{
 				$this->_guessLinkType($value, $data);
-				$value = $this->format($value, false);
+				//@@@trob: apply numberFormat also in details view (like in list view), for backward compat only in case of no guess link
+				$doNumberFormat = $params->get('guess_linktype','0') == '0' ? true :false;
+				$value = $this->format($value, $doNumberFormat);
 				$value = $this->getReadOnlyOutput($value, $value);
 			}
 
@@ -191,6 +196,7 @@ class PlgFabrik_ElementField extends PlgFabrik_Element
 
 		$layout = $this->getLayout('form');
 		$layoutData = new stdClass;
+		$layoutData->scanQR = $params->get('scan_qrcode', '0') === '1';
 		$layoutData->attributes = $bits;
 		$layoutData->sizeClass = $params->get('bootstrap_class', '');
 
@@ -348,6 +354,8 @@ class PlgFabrik_ElementField extends PlgFabrik_Element
 		$config = JComponentHelper::getParams('com_fabrik');
 		$apiKey = trim($config->get('google_api_key', ''));
 		$opts->mapKey = empty($apiKey) ? false : $apiKey;
+		$opts->language = trim(strtolower($config->get('google_api_language', '')));
+
 
 		if ($this->getParams()->get('autocomplete', '0') == '2')
 		{
@@ -356,6 +364,8 @@ class PlgFabrik_ElementField extends PlgFabrik_Element
 			$autoOpts['storeMatchedResultsOnly'] = false;
 			FabrikHelperHTML::autoComplete($id, $this->getElement()->id, $this->getFormModel()->getId(), 'field', $autoOpts);
 		}
+
+		$opts->scanQR = $params->get('scan_qrcode', '0') === '1';
 
 		return array('FbField', $id, $opts);
 	}
@@ -376,6 +386,7 @@ class PlgFabrik_ElementField extends PlgFabrik_Element
 		$params = $this->getParams();
 		$inputMask = trim($params->get('text_input_mask', ''));
 		$geoComplete = $params->get('autocomplete', '0') === '3';
+		$scanQR = $params->get('scan_qrcode', '0') === '1';
 
 		$s = new stdClass;
 
@@ -395,6 +406,12 @@ class PlgFabrik_ElementField extends PlgFabrik_Element
 		{
 			$folder = 'components/com_fabrik/libs/googlemaps/geocomplete/';
 			$s->deps[] = $folder . 'jquery.geocomplete';
+		}
+
+		if ($scanQR)
+		{
+			$folder = 'components/com_fabrik/libs/jsqrcode/';
+			$s->deps[] = $folder . 'qr_packed';
 		}
 		
 		if (array_key_exists($key, $shim))

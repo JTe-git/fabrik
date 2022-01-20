@@ -179,6 +179,7 @@
 				<option value="LINE">Line</option>
 				<option value="PIE2D">Pie 2D</option>
 				<option value="PIE3D">Pie 3D</option>
+				<option value="RADAR">Radar</option>
 				<option value="MSAREA2D">MS Area 2D</option>
 				<option value="MSBAR2D">MS Bar 2D</option>
 				<option value="MSBAR3D">MS Bar 3D</option>
@@ -194,6 +195,7 @@
 				<option value="STACKEDAREA2D">Stacked Area 2D</option>
 				<option value="STACKEDBAR2D">Stacked Bar 2D</option>
 				<option value="STACKEDCOLUMN2D">Stacked Column 2D</option>
+				<option value="MSSTACKEDCOLUMN2D">MS Stacked Column 2D</option>
 				<option value="STACKEDCOLUMN3D">Stacked Column 3D</option>
 				<option value="SCROLLAREA2D">Scroll Area 2D</option>
 				<option value="SCROLLCOLUMN2D">Scroll Column 2D</option>
